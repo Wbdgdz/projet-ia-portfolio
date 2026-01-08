@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Projets</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div id="Bandeau">
+        <ul id="liens">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li><a href="APropos.html">À Propos de moi</a></li>
+            <li><a href="Projets.html">Mes Projets</a></li>
+        </ul>
+    </div>
+
+    <div id="Menu">
+        <ul>
+            <li class="menu-category">Première année</li>
+            <ul>
+                <li><a href="#BDR">BDR</a></li>
+                <li><a href="#ConcoursDV">Concours Datavisualisation</a></li>
+                <li><a href="#Analyse">Analyse de Données, Reporting et Datavisualisation</a></li>
+                <li><a href="#RegressLin">Régression Linéaire</a></li>
+                <li><a href="#ProdDonnees">Production de données</a></li>
+            </ul>
+            <li class="menu-category">Deuxième année</li>
+            <ul>
+                <li><a href="#Decisionnel">Développement d’un composant d’une solution décisionnel</a></li>
+                <li><a href="#ReportingMulti">Reporting d'une analyse multivariée</a></li>
+                <li><a href="#BesoinsTerritoire">Répondre aux Besoins du territoire</a></li>
+                <li><a href="#Datawarehouse">Intégration de données dans un datawarehouse</a></li>
+                <li><a href="#CollecteWeb">Collecte de donnée web</a></li>
+            </ul>
+            <li class="menu-category">Projets Personnels</li>
+            <ul>
+                <li><a href="#DelMorino">Système d'Assurance Qualité chez Del Morino</a></li>
+                <li><a href="#Veolia">Stage à Veolia Eau Chine</a></li>
+            </ul>
+        </ul>
+    </div>
+
+    <div id="Contenu">
+        <div class="zone" id="ProjetsIUT">
+            <h2>Projets 1ère année</h2>
+            <p>Voici une liste de mes projets réalisés en première année à l'IUT :</p>
+            <ul>
+                <li><strong>Conception et Implémentation d'une base de données : </strong>SQL, Python, CSV</li>
+                <li><strong>Concours Datavisualisation : </strong> Power BI, PPT, CSV</li>
+                <li><strong>Analyse de Données, Reporting et Datavisualisation : </strong>Power BI, Python, PPT, Excel</li>
+                <li><strong>Régression Linéaire : </strong>R avec R Studio</li>
+                <li><strong>Production de données : </strong>Python, SQL, Excel</li>
+            </ul>
+            <div class="image-container">
+                <img src="IUT.png" class="image-right" alt="">
+            </div>
+        </div>
+        <div class="zone" id="BDR">
+            <h2>Conception et Implémentation d'une base de données</h2>
+            <p class="bdr">Projet de création d’une base de données pour la gestion des pompiers et des interventions, intégrant les spécificités des statuts, des casernes et des situations d’urgence. Ce travail m’a permis de consolider mes compétences en modélisation et en SQL.</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="sdis79.py" download target="_blank">télécharger le code python</a></p>
+            <div class="image-container">
+                <img src="bdr.jpg" class="image-right" alt="Base de données pompiers">
+            </div>
+        </div>
+        <div class="zone" id="ConcoursDV">
+            <h2>Concours Datavisualisation</h2>
+            <p class="limited-width">Projet de datavisualisation sur l’importance des services météorologiques pour la sécurité, à partir des données de Météo-France. J’ai conçu des visualisations pour illustrer l’impact local des phénomènes climatiques et l’utilité de la prévision.</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="CONCOURS DATAVIZ KHARBOUCHE ZHOU PROUTEAU TESSIER.pbix" download target="_blank">télécharger le power BI</a></p>
+            <div class="image-container">
+                <img src="meteofrance.png" class="image-right" alt="Datavisualisation Météo-France">
+            </div>
+        </div>
+        <div class="zone" id="Analyse">
+            <h2>Analyse de Données, Reporting et Datavisualisation</h2>
+            <p class="limited-width">Le but de ce projet est de concevoir un outil dynamique permettant d'évaluer l'étendue et les caractéristiques des Accidents de la Vie Courante (AcVC) en France à partir de données fournis par l'Observatoire Mavie, d'identifier les facteurs de survenue et de gravité, et de proposer des mesures de prévention adaptées et innovantes.</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="presentation.pptx" download target="_blank">télécharger le power point</a> ou <a href="powerbi_grp4.pbix" download target="_blank">télécharger le power BI</a></p>
+            <div class="image-container">
+                <img src="Mavie.jpg" class="image-right" alt="">
+            </div>
+        </div>
+        <div class="zone" id="RegressLin">
+            <h2>Régression Linéaire</h2>
+            <p class="limited-width">La régression linéaire est une méthode statistique utilisée pour modéliser la relation entre une variable dépendante (ou cible) et une ou plusieurs variables indépendantes (ou prédicteurs). Le but est de trouver la meilleure ligne droite (ou hyperplan dans le cas de multiples prédicteurs) qui minimise la somme des carrés des différences entre les valeurs observées et les valeurs prédites. Nous devions étudier le cas des logements sur Paris.</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="SAE REGRESSION.pdf" download target="_blank">télécharger mon rapport</a></p>
+            <div class="image-container">
+                <img src="Paris.jpg" class="image-right" alt="">
+            </div>
+        </div>
+        <div class="zone" id="ProdDonnees">
+            <h2>Production de données en entreprise </h2>
+            <p class="limited-width">Ce projet consistait en une étude approfondie de la situation socio-économique de la Martinique en 2020. J'ai analysé des données démographiques, économiques et sociales afin de dresser un état des lieux précis et d'identifier les principaux enjeux du territoire. L'étude a permis de mettre en lumière les dynamiques de population, d'emploi, de développement économique et les défis spécifiques rencontrés par la Martinique.</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="David ZHOU-SAE-Apprendre en situation la production de données en entreprise.pdf" download target="_blank">télécharger le rapport</a></p>
+            <div class="image-container">
+                <img src="Martinique-.webp" class="image-right" alt="Étude socio-économique Martinique">
+            </div>
+        </div>
+        <!-- Projets 2ème année -->
+        <div class="zone" id="Projets2A">
+            <h2>Projets 2ème année</h2>
+            <p>Voici une sélection de mes projets les plus enrichissants réalisés en deuxième année à l'IUT :</p>
+            <ul>
+                <li><strong>Développement d’un composant d’une solution décisionnel : </strong>Power BI, SQL, <a href="#Decisionnel">voir détails</a></li>
+                <li><strong>Reporting d'une analyse multivariée : </strong>R, Shiny, <a href="#ReportingMulti">voir détails</a></li>
+                <li><strong>Répondre aux Besoins du territoire : </strong>Power BI, <a href="#BesoinsTerritoire">voir détails</a></li>
+                <li><strong>Intégration de données dans un datawarehouse : </strong>SQL, <a href="#Datawarehouse">voir détails</a></li>
+                <li><strong>Collecte de donnée web : </strong>Python, <a href="#CollecteWeb">voir détails</a></li>
+            </ul>
+        </div>
+        <div class="zone" id="Decisionnel">
+            <h2>Développement d’un composant d’une solution décisionnel</h2>
+            <p class="limited-width">Développement d’une API REST avec NodeJS et MySQL pour faciliter l’accès à la base CCAM, permettant aux professionnels de santé de rechercher et d’exploiter efficacement les actes médicaux. Ce projet m’a permis de renforcer mes compétences en développement backend et en gestion de bases de données.</p>
+            <div class="image-container">
+                <img src="decisionnel.jpeg" class="image-right" alt="Projet décisionnel CCAM API">
+            </div>
+        </div>
+        <div class="zone" id="ReportingMulti">
+            <h2>SAE 4.02 : Reporting d’une analyse multivariée</h2>
+            <p class="limited-width">Création d’un outil interactif de suivi de la pauvreté en France (1970-2021), permettant une visualisation claire des évolutions et facilitant la prise de décision au niveau territorial. Ce projet a renforcé mes compétences en datavisualisation et en analyse de données sociales.</p>
+            <div class="image-container">
+                <img src="Multi.png" class="image-right" alt="Reporting analyse multivariée pauvreté France">
+            </div>
+            <p>Consultez le site : <a href="https://daweizhou.shinyapps.io/SAEZhouDubuyRigot/" target="_blank">https://daweizhou.shinyapps.io/SAEZhouDubuyRigot/</a></p>
+        </div>
+        <div class="zone" id="BesoinsTerritoire">
+            <h2>Répondre aux Besoins du territoire - Cours à Jean Macé</h2>
+            <p class="limited-width">Ce projet a consisté à concevoir et animer des séances d’initiation au HTML, CSS et à l’introduction au JavaScript auprès des élèves de 1ère NSI du lycée Jean Macé. L’objectif principal était de transmettre les bases du développement web et de susciter l’intérêt des élèves pour les technologies numériques. Cette expérience m’a permis de développer mes compétences pédagogiques et de gestion de groupe, tout en confirmant mon attrait pour le partage de connaissances, même si je ne me projette pas dans une carrière d’enseignant.</p>
+            <div class="image-container">
+                <img src="Cours.png" class="image-right" alt="Cours au lycée Jean Macé">
+            </div>
+        </div>
+        <div class="zone" id="Datawarehouse">
+            <h2>Intégration de données dans un datawarehouse</h2>
+            <p class="limited-width">Ce projet avait pour objectif d’alimenter un entrepôt de données (datawarehouse) afin d’analyser l’évolution des ventes selon plusieurs axes : géographie, temps, produit, client et employé. Nous avons conçu et intégré les données pour permettre la création de tableaux de bord dynamiques et interactifs, offrant une vision complète des performances de l’entreprise. Au total, une dizaine de tableaux de bord ont été réalisés, permettant de visualiser les ventes par région, par période, par catégorie de produit, par segment de clientèle ou encore par employé. Ces outils facilitent la prise de décision stratégique et l’identification des leviers de croissance.</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="datawarehouse.pdf" download target="_blank">télécharger le rapport</a>.</p>
+            <div class="image-container">
+                <img src="Sport.jpg" class="image-right" alt="Tableaux de bord datawarehouse ventes">
+            </div>
+        </div>
+        <div class="zone" id="CollecteWeb">
+            <h2>Collecte de donnée web</h2>
+            <p class="limited-width">Ce projet a consisté à automatiser la collecte et l’analyse de données ouvertes sur le territoire français. J’ai développé un script Python pour extraire des données géographiques et créer des visualisations interactives, ainsi qu’un outil exploitant l’API ADEME pour analyser les diagnostics énergétiques des logements. Ce travail m’a permis de renforcer mes compétences en automatisation, en intégration d’API et en datavisualisation.</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="CollecteWeb.rar" download target="_blank">télécharger l’archive du projet</a>.</p>
+            <div class="image-container">
+                <img src="Olymp.avif" class="image-right" alt="Visualisation collecte de données web et DPE">
+            </div>
+        </div>
+
+        <div class="zone" id="ProjetsPersonnels">
+            <h2>Projets Personnels</h2>
+            <p>Voici quelques-uns de mes projets personnels réalisés pendant mes stages :</p>
+            <ul>
+                <li><strong>Système d'Assurance Qualité chez Del Morino : </strong>Excel</li>
+                <li><strong>Stage à Veolia Eau Chine : </strong>YongHong BI, SQL, Excel</li>
+            </ul>
+        </div>
+        <div class="zone" id="DelMorino">
+            <h2>Système d'Assurance Qualité chez Del Morino</h2>
+            <p class="limited-width">Pendant mon stage chez Delmorino, j'ai eu l'opportunité de travailler en étroite collaboration avec un tuteur expérimenté pour mettre en place un système d'assurance qualité. Sous sa guidance attentive, j'ai participé à toutes les étapes du processus, de la conception à la mise en œuvre du système. Ce fut une expérience enrichissante qui m'a permis d'acquérir une compréhension approfondie des normes de qualité et des meilleures pratiques dans le domaine. Ce système d'assurance qualité a permis à l'entreprise de garantir la fiabilité et la cohérence de ses produits tout en optimisant ses processus de production. Grâce à cette initiative, Delmorino a pu renforcer la confiance de ses clients et consolider sa réputation d'excellence dans l'industrie..</p>
+            <p>Si cela vous intéresse, vous pouvez <a href="REPORT-R2023.02.pdf" download target="_blank">télécharger mon rapport</a></p>
+            <div class="image-container">
+                <img src="delmorino.jpg" class="image-right" alt="">
+            </div>
+        </div>
+        <div class="zone" id="Veolia">
+            <h2>Stage à Veolia Chine</h2>
+            <p class="limited-width">Actuellement en stage chez Veolia en Chine</p>
+            <div class="image-container">
+                <img src="Veolia.png" class="image-right" alt="Stage Veolia Eau Chine">
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
