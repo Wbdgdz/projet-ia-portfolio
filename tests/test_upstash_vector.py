@@ -10,10 +10,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env", override=True)
 
 def test_upstash():
+    # This is an integration test (requires network + real credentials).
+    if os.getenv("RUN_INTEGRATION") != "1":
+        pytest.skip("Integration test skipped (set RUN_INTEGRATION=1 to run).")
     if not os.getenv("UPSTASH_VECTOR_REST_URL") or not os.getenv("UPSTASH_VECTOR_REST_TOKEN"):
         pytest.fail(
             "Variables Upstash manquantes (UPSTASH_VECTOR_REST_URL / UPSTASH_VECTOR_REST_TOKEN). "
-            "Renseigne-les dans le fichier .env (copié depuis .env.example)."
+            "Renseigne-les dans .env (ou Streamlit secrets) puis relance avec RUN_INTEGRATION=1."
         )
 
     index = Index(

@@ -10,9 +10,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env", override=True)
 
 def test_openai_agent_runs_ping_pong():
+    # This is an integration test (requires network + real credentials).
+    if os.getenv("RUN_INTEGRATION") != "1":
+        pytest.skip("Integration test skipped (set RUN_INTEGRATION=1 to run).")
     if not os.getenv("OPENAI_API_KEY"):
         pytest.fail(
-            "OPENAI_API_KEY non défini. Renseigne-le dans le fichier .env (copié depuis .env.example)."
+            "OPENAI_API_KEY non défini. Renseigne-le dans .env (ou Streamlit secrets) puis relance avec RUN_INTEGRATION=1."
         )
 
     agent = Agent(
