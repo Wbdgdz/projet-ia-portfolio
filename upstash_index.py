@@ -76,6 +76,12 @@ def main() -> int:
     url = require_env("UPSTASH_VECTOR_REST_URL")
     token = require_env("UPSTASH_VECTOR_REST_TOKEN")
 
+    namespace = args.namespace
+    if namespace is None:
+        namespace = os.getenv("UPSTASH_VECTOR_NAMESPACE")
+    if namespace is not None and namespace.strip() == "":
+        namespace = None
+
     if not (url.startswith("https://") or url.startswith("http://")):
         raise SystemExit(
             "UPSTASH_VECTOR_REST_URL must start with https:// (or http://). "
@@ -116,8 +122,8 @@ def main() -> int:
     if args.dry_run:
         print(f"Dry run: would upsert {len(vectors)} vectors")
         print(f"Index URL: {url}")
-        if args.namespace:
-            print(f"Namespace: {args.namespace}")
+        if namespace:
+            print(f"Namespace: {namespace}")
         print(f"First id: {vectors[0].id}")
         return 0
 
@@ -125,8 +131,8 @@ def main() -> int:
 
     total = 0
     for batch_no, batch in enumerate(batched(vectors, args.batch_size), start=1):
-        if args.namespace:
-            result = index.upsert(vectors=batch, namespace=args.namespace)
+        if namespace:
+            result = index.upsert(vectors=batch, namespace=namespace)
         else:
             result = index.upsert(vectors=batch)
         total += len(batch)
