@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from profile_agent import list_profile_sections_impl
+from profile_sections import list_profile_sections_impl
 
 
 def test_list_profile_sections_mentions_data_files():

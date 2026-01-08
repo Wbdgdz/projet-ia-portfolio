@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 from dotenv import load_dotenv
-from upstash_vector import Index, Vector
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env", override=True)
@@ -18,6 +17,8 @@ def test_upstash():
             "Variables Upstash manquantes (UPSTASH_VECTOR_REST_URL / UPSTASH_VECTOR_REST_TOKEN). "
             "Renseigne-les dans .env (ou Streamlit secrets) puis relance avec RUN_INTEGRATION=1."
         )
+
+    from upstash_vector import Index, Vector
 
     index = Index(
         url=os.getenv("UPSTASH_VECTOR_REST_URL"), 

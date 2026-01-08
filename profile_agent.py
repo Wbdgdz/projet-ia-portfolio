@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-import re
 
 from agents import Agent, ModelSettings, function_tool
 
+from profile_sections import list_profile_sections_impl
 from rag_tool import bootstrap_env, format_results, load_rag_config, make_index
 
 
@@ -22,41 +22,6 @@ def retrieve_profile_context_impl(query: str, top_k: int = 5) -> str:
     )
 
     return format_results(results)
-
-
-def list_profile_sections_impl() -> str:
-    data_dir = Path(__file__).resolve().parent / "data"
-    if not data_dir.exists():
-        return "Aucune donnée trouvée (dossier data/ manquant)."
-
-    heading_re = re.compile(r"^(#{1,3})\s+(.*)\s*$")
-    lines: list[str] = ["Sections disponibles :"]
-
-    for md_path in sorted(data_dir.glob("*.md")):
-        try:
-            text = md_path.read_text(encoding="utf-8")
-        except Exception:
-            continue
-
-        headings: list[str] = []
-        for raw in text.splitlines():
-            m = heading_re.match(raw)
-            if not m:
-                continue
-            level = len(m.group(1))
-            title = m.group(2).strip()
-            if not title:
-                continue
-            if level == 1:
-                headings.append(title)
-            elif level == 2:
-                headings.append(f"- {title}")
-
-        if headings:
-            lines.append(f"\n{md_path.name}:")
-            lines.extend(headings)
-
-    return "\n".join(lines).strip()
 
 
 @function_tool

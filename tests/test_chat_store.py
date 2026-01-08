@@ -49,7 +49,7 @@ def test_roundtrip_chat_state_with_fake_redis(monkeypatch):
 
     fake = FakeRedis()
     monkeypatch.setattr(chat_store, "_make_redis_client", lambda: fake)
-    monkeypatch.setattr(chat_store, "bootstrap_env", lambda *args, **kwargs: None)
+    monkeypatch.setattr(chat_store, "_bootstrap_env", lambda: None)
 
     messages = [
         {"role": "user", "content": "salut"},

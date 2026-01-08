@@ -5,7 +5,15 @@ import os
 from dataclasses import dataclass
 from typing import Any
 
-from rag_tool import bootstrap_env
+
+def _bootstrap_env() -> None:
+    try:
+        from rag_tool import bootstrap_env  # local import to avoid hard dependency at import time
+
+        bootstrap_env()
+    except Exception:
+        # Best-effort: if dotenv/streamlit isn't available, we simply won't persist.
+        return
 
 
 @dataclass(frozen=True)
@@ -53,7 +61,7 @@ def load_chat_state(conversation_id: str) -> dict[str, Any] | None:
        "previous_response_id": str|None}
     """
 
-    bootstrap_env()
+    _bootstrap_env()
 
     url = os.getenv("UPSTASH_REDIS_REST_URL")
     token = os.getenv("UPSTASH_REDIS_REST_TOKEN")
@@ -90,7 +98,7 @@ def save_chat_state(
 ) -> None:
     """Persist the full chat state (best-effort; no-op if not configured)."""
 
-    bootstrap_env()
+    _bootstrap_env()
 
     url = os.getenv("UPSTASH_REDIS_REST_URL")
     token = os.getenv("UPSTASH_REDIS_REST_TOKEN")
