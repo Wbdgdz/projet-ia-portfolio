@@ -6,7 +6,7 @@ from chunk_data import build_chunks_for_file, chunk_markdown, iter_markdown_file
 
 
 def test_normalize_ws_trims_and_newline():
-    assert normalize_ws("\n\n  a  \n\n") == "  a\n"
+    assert normalize_ws("\n\n  a  \n\n") == "a\n"
 
 
 def test_chunk_markdown_excludes_heading_lines_and_splits_on_h2():
