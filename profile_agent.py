@@ -7,14 +7,7 @@ from agents import Agent, ModelSettings, function_tool
 from rag_tool import bootstrap_env, format_results, load_rag_config, make_index
 
 
-@function_tool
-def retrieve_profile_context(query: str, top_k: int = 5) -> str:
-    """Retrieve relevant profile context from the Upstash Vector index.
-
-    Use this tool whenever the user asks about the profile (projects, experiences,
-    skills, education, contact). It returns short excerpts plus metadata.
-    """
-
+def retrieve_profile_context_impl(query: str, top_k: int = 5) -> str:
     project_root = Path(__file__).resolve().parent
     cfg = load_rag_config(project_root)
     index = make_index(cfg)
@@ -30,16 +23,28 @@ def retrieve_profile_context(query: str, top_k: int = 5) -> str:
     return format_results(results)
 
 
+@function_tool
+def retrieve_profile_context(query: str, top_k: int = 5) -> str:
+    """Retrieve relevant profile context from the Upstash Vector index.
+
+    Use this tool whenever the user asks about the profile (projects, experiences,
+    skills, education, contact). It returns short excerpts plus metadata.
+    """
+
+    return retrieve_profile_context_impl(query=query, top_k=top_k)
+
+
 def build_agent() -> Agent[None]:
     bootstrap_env(Path(__file__).resolve().parent)
 
     instructions = (
-        "Tu es un assistant qui répond aux questions sur le profil (portfolio) de l'utilisateur.\n"
-        "Quand une question concerne le profil (expériences, projets, compétences, formation, contact), "
+        "Tu t'appelles Dawei David Zhou et tu réponds à l'utilisateur en parlant à la première personne (" 
+        "comme si tu étais Dawei).\n"
+        "Quand une question concerne ton profil (expériences, projets, compétences, formation, contact), "
         "utilise l'outil retrieve_profile_context pour récupérer des extraits pertinents, puis répond en français "
-        "en t'appuyant sur ces extraits.\n"
+        "en t'appuyant strictement sur ces extraits.\n"
         "Si l'information n'est pas dans les extraits, dis-le clairement au lieu d'inventer.\n"
-        "Réponse concise, structurée en puces si nécessaire."
+        "Réponse concise, naturelle et professionnelle; utilise des puces si nécessaire."
     )
 
     return Agent(
