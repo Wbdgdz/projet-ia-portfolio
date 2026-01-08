@@ -41,26 +41,72 @@ Pour commencer, vous devez créer plusieurs fichiers Markdown (`.md`) dans le do
 ### 2. Découpage des documents (Chunking)
 Afin que l'IA puisse retrouver précisément l'information, vous devez diviser vos fichiers Markdown en petits morceaux cohérents.
 
+Dans ce projet, le script [chunk_data.py](chunk_data.py) génère un fichier `chunks.jsonl` à partir des fichiers du dossier `data/`.
+
+Commandes :
+* Générer les chunks : `python chunk_data.py`
+
+Résultat attendu :
+* Création d'un fichier `chunks.jsonl` à la racine du projet (ce fichier est ignoré par git).
+
 ### 3. Indexation dans Upstash
 Une fois vos documents découpés, vous devez les envoyer dans votre index Upstash Vector.
 * [Documentation : SDK Python Upstash Vector](https://upstash.com/docs/vector/sdks/py/gettingstarted)
+
+Dans ce projet, le script [upstash_index.py](upstash_index.py) lit `chunks.jsonl` et envoie les vecteurs dans Upstash.
+
+Commandes :
+* (Optionnel) Vérifier sans envoyer : `python upstash_index.py --dry-run`
+* Indexer réellement : `python upstash_index.py`
+
+Notes :
+* Assurez-vous que `UPSTASH_VECTOR_REST_URL` et `UPSTASH_VECTOR_REST_TOKEN` sont renseignées dans `.env`.
+* (Optionnel) Vous pouvez définir `UPSTASH_VECTOR_NAMESPACE` dans `.env` si vous utilisez un namespace.
 
 ### 4. Création de l'Agent IA
 Développez votre agent en utilisant la bibliothèque `openai-agents`.
 * [Documentation : Introduction aux Agents](https://openai.github.io/openai-agents-python/agents/)
 * [Documentation : Comment lancer un Agent](https://openai.github.io/openai-agents-python/running_agents/)
 
+Dans ce projet, l'agent est défini dans [profile_agent.py](profile_agent.py).
+
 ### 5. Connexion Agent ↔ Vecteurs (RAG)
 Ajoutez une **Tool** (fonction) à votre agent pour lui permettre d'interroger votre base de données vectorielle lorsqu'une question est posée sur votre profil.
 * [Documentation : Utilisation des Tools](https://openai.github.io/openai-agents-python/tools/)
+
+Dans ce projet :
+* La configuration + helpers RAG sont dans [rag_tool.py](rag_tool.py)
+* La tool de récupération est câblée dans [profile_agent.py](profile_agent.py)
 
 ### 6. Interface Utilisateur (Streamlit)
 Créez une interface de chat pour permettre aux utilisateurs d'interagir avec votre agent.
 * [Tutoriel : Créer une application de chat avec Streamlit](https://docs.streamlit.io/develop/tutorials/chat-and-llm-apps/build-conversational-apps)
 
+L'application Streamlit est dans [streamlit_app.py](streamlit_app.py).
+
+Commande :
+* Lancer l'app : `streamlit run streamlit_app.py`
+
 ### 7. Déploiement sur Streamlit Cloud
 Une fois votre application fonctionnelle, déployez là sur Streamlit Cloud.
 * [Documentation : Déployer votre application sur Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy)
+
+Recommandations de configuration (Streamlit Community Cloud) :
+* **Main file path** : `streamlit_app.py`
+* **Python version** : 3.12+ (3.13 fonctionne en local; utilisez une version supportée par Streamlit Cloud)
+* **Secrets** : ne pas committer `.env`. Dans les *App settings* → *Secrets*, ajoutez :
+    * `OPENAI_API_KEY`
+    * `UPSTASH_VECTOR_REST_URL`
+    * `UPSTASH_VECTOR_REST_TOKEN`
+    * (Optionnel) `UPSTASH_VECTOR_NAMESPACE`
+
+Exemple de contenu à coller dans *Secrets* (valeurs à remplacer) :
+```
+OPENAI_API_KEY = "..."
+UPSTASH_VECTOR_REST_URL = "https://..."
+UPSTASH_VECTOR_REST_TOKEN = "..."
+UPSTASH_VECTOR_NAMESPACE = ""  # optionnel
+```
 
 ## Pour aller plus loin (Bonus)
 
