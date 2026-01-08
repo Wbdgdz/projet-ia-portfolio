@@ -1,13 +1,19 @@
 import os
+from pathlib import Path
+
+import pytest
 from dotenv import load_dotenv
 
 from agents import Agent, Runner, ModelSettings
 
-load_dotenv(override=True)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(dotenv_path=PROJECT_ROOT / ".env", override=True)
 
 def test_openai_agent_runs_ping_pong():
     if not os.getenv("OPENAI_API_KEY"):
-        print("OPENAI_API_KEY non défini.")
+        pytest.fail(
+            "OPENAI_API_KEY non défini. Renseigne-le dans le fichier .env (copié depuis .env.example)."
+        )
 
     agent = Agent(
         name="ping-agent",
