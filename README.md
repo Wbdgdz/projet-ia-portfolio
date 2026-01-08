@@ -112,7 +112,12 @@ UPSTASH_VECTOR_NAMESPACE = ""  # optionnel
 
 Si vous avez terminé les étapes précédentes et souhaitez enrichir votre projet :
 * **Sauvegarder les conversations** : Utilisez [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted) pour mémoriser l'historique des échanges entre l'utilisateur et l'agent.
+    * Créez une base **Upstash Redis** (plan Free) et récupérez : `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN`
+    * Renseignez-les dans `.env` en local, ou dans **Streamlit Cloud → Settings → Secrets**
+    * L'app sauvegarde automatiquement `messages` + `previous_response_id` dans Redis
+    * (Optionnel) Réglages : `CHAT_STORE_PREFIX` et `CHAT_STORE_TTL_SECONDS`
 * **Ajouter des nouveaux tools** : Permettez à votre agent d'effectuer d'autres actions (ajout de tools).
+    * Dans ce projet, un tool bonus `list_profile_sections` liste les sections disponibles à partir des fichiers `data/*.md`.
 
 ## Notes Importantes
 

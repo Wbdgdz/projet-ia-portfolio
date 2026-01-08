@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
+from uuid import uuid4
 
 import streamlit as st
 from agents import Runner
 
+from chat_store import load_chat_state, save_chat_state
 from profile_agent import build_agent
 from rag_tool import bootstrap_env
 
@@ -16,11 +18,44 @@ bootstrap_env(PROJECT_ROOT)
 st.set_page_config(page_title="Chat Portfolio (RAG)")
 st.title("Chat Portfolio (RAG)")
 
+def _get_query_params() -> dict[str, list[str]]:
+    try:
+        return {k: list(v) for k, v in st.query_params.items()}  # type: ignore[attr-defined]
+    except Exception:
+        return st.experimental_get_query_params()  # type: ignore[attr-defined]
+
+
+def _set_query_params(**kwargs: str) -> None:
+    try:
+        st.query_params.update(kwargs)  # type: ignore[attr-defined]
+    except Exception:
+        st.experimental_set_query_params(**kwargs)  # type: ignore[attr-defined]
+
+
+if "conversation_id" not in st.session_state:
+    qp = _get_query_params()
+    cid = (qp.get("cid") or [""])[0].strip()
+    if not cid:
+        cid = uuid4().hex
+        _set_query_params(cid=cid)
+    st.session_state.conversation_id = cid
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "previous_response_id" not in st.session_state:
     st.session_state.previous_response_id = None
+
+if "loaded_persisted_history" not in st.session_state:
+    st.session_state.loaded_persisted_history = True
+    state = load_chat_state(st.session_state.conversation_id)
+    if state and isinstance(state.get("messages"), list):
+        st.session_state.messages = [
+            m
+            for m in state.get("messages", [])
+            if isinstance(m, dict) and m.get("role") in {"user", "assistant"}
+        ]
+        st.session_state.previous_response_id = state.get("previous_response_id")
 
 agent = build_agent()
 
@@ -31,6 +66,11 @@ for msg in st.session_state.messages:
 user_text = st.chat_input("Pose une question sur mon profil…")
 if user_text:
     st.session_state.messages.append({"role": "user", "content": user_text})
+    save_chat_state(
+        st.session_state.conversation_id,
+        messages=st.session_state.messages,
+        previous_response_id=st.session_state.previous_response_id,
+    )
     with st.chat_message("user"):
         st.markdown(user_text)
 
@@ -54,3 +94,8 @@ if user_text:
         st.markdown(answer)
 
     st.session_state.messages.append({"role": "assistant", "content": answer})
+    save_chat_state(
+        st.session_state.conversation_id,
+        messages=st.session_state.messages,
+        previous_response_id=st.session_state.previous_response_id,
+    )

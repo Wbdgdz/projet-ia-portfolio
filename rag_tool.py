@@ -31,6 +31,8 @@ def _apply_streamlit_secrets_to_env() -> None:
         "UPSTASH_VECTOR_REST_URL",
         "UPSTASH_VECTOR_REST_TOKEN",
         "UPSTASH_VECTOR_NAMESPACE",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
     ):
         if os.getenv(key):
             continue
