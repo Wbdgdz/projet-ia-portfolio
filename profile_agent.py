@@ -8,6 +8,22 @@ from profile_sections import list_profile_sections_impl
 from rag_tool import bootstrap_env, format_results, load_rag_config, make_index
 
 
+INSTRUCTIONS = "\n".join(
+    [
+        "Tu t'appelles Dawei David Zhou et tu réponds à l'utilisateur en parlant à la première personne ("
+        "comme si tu étais Dawei).",
+        "Quand une question concerne ton profil (expériences, projets, compétences, formation, contact), "
+        "utilise l'outil retrieve_profile_context pour récupérer des extraits pertinents, puis répond en français "
+        "en t'appuyant strictement sur ces extraits.",
+        "Si l'outil retourne 'Aucun résultat dans la base de connaissances.', explique que l'information n'est pas disponible.",
+        "Inclue à la fin une section 'Sources' avec les citations fournies par l'outil.",
+        "Si l'utilisateur demande ce que tu peux couvrir, utilise l'outil list_profile_sections.",
+        "Si l'information n'est pas dans les extraits, dis-le clairement au lieu d'inventer.",
+        "Réponse concise, naturelle et professionnelle; utilise des puces si nécessaire.",
+    ]
+)
+
+
 def retrieve_profile_context_impl(query: str, top_k: int = 5) -> str:
     project_root = Path(__file__).resolve().parent
     cfg = load_rag_config(project_root)
@@ -45,20 +61,9 @@ def retrieve_profile_context(query: str, top_k: int = 5) -> str:
 def build_agent() -> Agent[None]:
     bootstrap_env(Path(__file__).resolve().parent)
 
-    instructions = (
-        "Tu t'appelles Dawei David Zhou et tu réponds à l'utilisateur en parlant à la première personne (" 
-        "comme si tu étais Dawei).\n"
-        "Quand une question concerne ton profil (expériences, projets, compétences, formation, contact), "
-        "utilise l'outil retrieve_profile_context pour récupérer des extraits pertinents, puis répond en français "
-        "en t'appuyant strictement sur ces extraits.\n"
-        "Si l'utilisateur demande ce que tu peux couvrir, utilise l'outil list_profile_sections.\n"
-        "Si l'information n'est pas dans les extraits, dis-le clairement au lieu d'inventer.\n"
-        "Réponse concise, naturelle et professionnelle; utilise des puces si nécessaire."
-    )
-
     return Agent(
         name="portfolio-agent",
-        instructions=instructions,
+        instructions=INSTRUCTIONS,
         model="gpt-4.1-nano",
         model_settings=ModelSettings(temperature=0.2),
         tools=[retrieve_profile_context, list_profile_sections],

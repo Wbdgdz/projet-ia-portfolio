@@ -20,7 +20,11 @@ _HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)\s*$")
 
 
 def iter_markdown_files(data_dir: Path) -> Iterable[Path]:
-    return sorted(p for p in data_dir.glob("*.md") if p.is_file() and p.name.lower() != "readme.md")
+    return sorted(
+        p
+        for p in data_dir.glob("*.md")
+        if p.is_file() and p.name.lower() != "readme.md"
+    )
 
 
 def normalize_ws(text: str) -> str:
@@ -60,13 +64,6 @@ def chunk_markdown(md_text: str) -> list[tuple[list[str], str]]:
         if text.strip():
             chunks.append((path, text))
         buffer = []
-
-    has_h2 = False
-    for l in lines:
-        m = _HEADING_RE.match(l)
-        if m and m.group(1) == "##":
-            has_h2 = True
-            break
 
     for line in lines:
         m = _HEADING_RE.match(line)
@@ -113,26 +110,10 @@ def build_chunks_for_file(md_path: Path) -> list[Chunk]:
     return chunks
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Chunk Markdown files under ./data into JSONL.")
-    parser.add_argument("--data-dir", default="data", help="Directory containing markdown files")
-    parser.add_argument("--out", default="chunks.jsonl", help="Output JSONL path")
-    args = parser.parse_args()
-
-    repo_root = Path(__file__).resolve().parent
-    data_dir = (repo_root / args.data_dir).resolve()
-    out_path = (repo_root / args.out).resolve()
-
-    if not data_dir.exists() or not data_dir.is_dir():
-        raise SystemExit(f"data dir not found: {data_dir}")
-
-    all_chunks: list[Chunk] = []
-    for md_file in iter_markdown_files(data_dir):
-        all_chunks.extend(build_chunks_for_file(md_file))
-
+def _write_chunks_jsonl(chunks: list[Chunk], out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as f:
-        for c in all_chunks:
+        for c in chunks:
             f.write(
                 json.dumps(
                     {
@@ -145,6 +126,34 @@ def main() -> int:
                 )
                 + "\n"
             )
+
+
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Chunk Markdown files under ./data into JSONL."
+    )
+    parser.add_argument(
+        "--data-dir", default="data", help="Directory containing markdown files"
+    )
+    parser.add_argument("--out", default="chunks.jsonl", help="Output JSONL path")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = _parse_args()
+
+    repo_root = Path(__file__).resolve().parent
+    data_dir = (repo_root / args.data_dir).resolve()
+    out_path = (repo_root / args.out).resolve()
+
+    if not data_dir.exists() or not data_dir.is_dir():
+        raise SystemExit(f"data dir not found: {data_dir}")
+
+    all_chunks: list[Chunk] = []
+    for md_file in iter_markdown_files(data_dir):
+        all_chunks.extend(build_chunks_for_file(md_file))
+
+    _write_chunks_jsonl(all_chunks, out_path)
 
     print(f"Wrote {len(all_chunks)} chunks to {out_path}")
     return 0

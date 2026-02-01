@@ -19,6 +19,12 @@ def require_env(name: str) -> str:
     return value
 
 
+def _normalize_optional(value: str | None) -> str | None:
+    if value is None or value.strip() == "":
+        return None
+    return value
+
+
 def iter_jsonl(path: Path) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as f:
@@ -37,7 +43,7 @@ def batched(seq: list[Any], batch_size: int) -> list[list[Any]]:
     return [seq[i : i + batch_size] for i in range(0, len(seq), batch_size)]
 
 
-def main() -> int:
+def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Index chunks.jsonl into an Upstash Vector index (uses REST URL/token from .env)."
     )
@@ -67,28 +73,25 @@ def main() -> int:
         action="store_true",
         help="Validate and show what would be uploaded, without calling Upstash",
     )
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    repo_root = Path(__file__).resolve().parent
-    dotenv_path = repo_root / ".env"
-    load_dotenv(dotenv_path=dotenv_path, override=True)
 
-    url = require_env("UPSTASH_VECTOR_REST_URL")
-    token = require_env("UPSTASH_VECTOR_REST_TOKEN")
+def _resolve_namespace(arg_value: str | None) -> str | None:
+    if arg_value is None:
+        return _normalize_optional(os.getenv("UPSTASH_VECTOR_NAMESPACE"))
+    return _normalize_optional(arg_value)
 
-    namespace = args.namespace
-    if namespace is None:
-        namespace = os.getenv("UPSTASH_VECTOR_NAMESPACE")
-    if namespace is not None and namespace.strip() == "":
-        namespace = None
 
+def _validate_index_url(url: str) -> None:
     if not (url.startswith("https://") or url.startswith("http://")):
         raise SystemExit(
             "UPSTASH_VECTOR_REST_URL must start with https:// (or http://). "
             "Copy the REST URL from your Upstash Vector index."
         )
 
-    chunks_path = (repo_root / args.chunks).resolve()
+
+def _load_chunks(repo_root: Path, chunks_arg: str) -> list[dict[str, Any]]:
+    chunks_path = (repo_root / chunks_arg).resolve()
     if not chunks_path.exists():
         raise SystemExit(
             f"Chunks file not found: {chunks_path}. Run: python chunk_data.py --out chunks.jsonl"
@@ -97,14 +100,17 @@ def main() -> int:
     items = iter_jsonl(chunks_path)
     if not items:
         raise SystemExit(f"No chunks found in {chunks_path}")
+    return items
 
+
+def _build_vectors(items: list[dict[str, Any]], id_prefix: str) -> list[Vector]:
     vectors: list[Vector] = []
     for obj in items:
         chunk_id = str(obj.get("id", "")).strip()
         content = str(obj.get("content", "")).strip()
         if not chunk_id or not content:
             raise SystemExit(
-                f"Invalid chunk entry (missing id/content): {obj.get('id')} from {chunks_path}"
+                f"Invalid chunk entry (missing id/content): {obj.get('id')}"
             )
 
         metadata = {
@@ -113,11 +119,30 @@ def main() -> int:
         }
         vectors.append(
             Vector(
-                id=f"{args.id_prefix}{chunk_id}",
+                id=f"{id_prefix}{chunk_id}",
                 data=content,
                 metadata=metadata,
             )
         )
+
+    return vectors
+
+
+def main() -> int:
+    args = _parse_args()
+
+    repo_root = Path(__file__).resolve().parent
+    dotenv_path = repo_root / ".env"
+    load_dotenv(dotenv_path=dotenv_path, override=True)
+
+    url = require_env("UPSTASH_VECTOR_REST_URL")
+    token = require_env("UPSTASH_VECTOR_REST_TOKEN")
+
+    namespace = _resolve_namespace(args.namespace)
+    _validate_index_url(url)
+
+    items = _load_chunks(repo_root, args.chunks)
+    vectors = _build_vectors(items, args.id_prefix)
 
     if args.dry_run:
         print(f"Dry run: would upsert {len(vectors)} vectors")
@@ -132,12 +157,11 @@ def main() -> int:
     total = 0
     for batch_no, batch in enumerate(batched(vectors, args.batch_size), start=1):
         if namespace:
-            result = index.upsert(vectors=batch, namespace=namespace)
+            index.upsert(vectors=batch, namespace=namespace)
         else:
-            result = index.upsert(vectors=batch)
+            index.upsert(vectors=batch)
         total += len(batch)
         print(f"Batch {batch_no}: upserted {len(batch)} (total {total})")
-        _ = result
 
     print(f"Done: upserted {total} vectors")
     return 0

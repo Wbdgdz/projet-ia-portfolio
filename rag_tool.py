@@ -58,6 +58,12 @@ def _require_env(name: str) -> str:
     return value
 
 
+def _normalize_optional(value: str | None) -> str | None:
+    if value is None or value.strip() == "":
+        return None
+    return value
+
+
 def load_rag_config(project_root: Path | None = None) -> RagConfig:
     root = project_root or Path(__file__).resolve().parent
     bootstrap_env(root)
@@ -65,9 +71,7 @@ def load_rag_config(project_root: Path | None = None) -> RagConfig:
     url = _require_env("UPSTASH_VECTOR_REST_URL")
     token = _require_env("UPSTASH_VECTOR_REST_TOKEN")
 
-    namespace = os.getenv("UPSTASH_VECTOR_NAMESPACE")
-    if namespace is not None and namespace.strip() == "":
-        namespace = None
+    namespace = _normalize_optional(os.getenv("UPSTASH_VECTOR_NAMESPACE"))
 
     return RagConfig(url=url, token=token, namespace=namespace)
 
@@ -80,34 +84,69 @@ def make_index(cfg: RagConfig) -> Index:
     return Index(url=cfg.url, token=cfg.token)
 
 
+def _extract_source_and_heading(metadata) -> tuple[str | None, str | None]:
+    if not metadata:
+        return None, None
+
+    source = metadata.get("source_file")
+    heading = None
+    heading_path = metadata.get("heading_path")
+    if isinstance(heading_path, list) and heading_path:
+        heading = " > ".join(str(x) for x in heading_path)
+
+    return source, heading
+
+
+def _format_header(i: int, score: float | None, source: str | None, heading: str | None) -> str:
+    header_bits = [f"{i}) score={score:.3f}"]
+    if source:
+        header_bits.append(f"source={source}")
+    if heading:
+        header_bits.append(f"section={heading}")
+    return " | ".join(header_bits)
+
+
+def _format_citation(i: int, source: str | None, heading: str | None) -> str | None:
+    if not (source or heading):
+        return None
+    label = source or "source_inconnu"
+    if heading:
+        label = f"{label} > {heading}"
+    return f"[{i}] {label}"
+
+
 def format_results(results, max_chars: int = 3500) -> str:
     if not results:
         return "Aucun résultat dans la base de connaissances."
 
     parts: list[str] = ["Résultats RAG (extraits) :"]
+    citations: list[str] = []
     for i, r in enumerate(results, start=1):
-        heading = None
-        source = None
-        if getattr(r, "metadata", None):
-            source = r.metadata.get("source_file")
-            hp = r.metadata.get("heading_path")
-            if isinstance(hp, list) and hp:
-                heading = " > ".join(str(x) for x in hp)
-
-        header_bits = [f"{i}) score={getattr(r, 'score', None):.3f}"]
-        if source:
-            header_bits.append(f"source={source}")
-        if heading:
-            header_bits.append(f"section={heading}")
-        parts.append(" | ".join(header_bits))
+        source, heading = _extract_source_and_heading(getattr(r, "metadata", None))
+        parts.append(
+            _format_header(
+                i,
+                getattr(r, "score", None),
+                source,
+                heading,
+            )
+        )
 
         snippet = (getattr(r, "data", None) or "").strip()
         if snippet:
             parts.append(snippet)
         parts.append("---")
 
+        citation = _format_citation(i, source, heading)
+        if citation:
+            citations.append(citation)
+
         if sum(len(p) + 1 for p in parts) > max_chars:
             parts.append("(… tronqué …)")
             break
+
+    if citations:
+        parts.append("Citations :")
+        parts.extend(f"- {c}" for c in citations)
 
     return "\n".join(parts).strip()
