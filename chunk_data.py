@@ -20,6 +20,7 @@ _HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)\s*$")
 
 
 def iter_markdown_files(data_dir: Path) -> Iterable[Path]:
+    """Return markdown files in the data directory, excluding README."""
     return sorted(
         p
         for p in data_dir.glob("*.md")
@@ -28,6 +29,7 @@ def iter_markdown_files(data_dir: Path) -> Iterable[Path]:
 
 
 def normalize_ws(text: str) -> str:
+    """Trim leading/trailing blank lines and normalize whitespace."""
     lines = [line.rstrip() for line in text.splitlines()]
     while lines and lines[0].strip() == "":
         lines.pop(0)
@@ -92,6 +94,7 @@ def chunk_markdown(md_text: str) -> list[tuple[list[str], str]]:
 
 
 def build_chunks_for_file(md_path: Path) -> list[Chunk]:
+    """Build chunks for a single markdown file."""
     md_text = md_path.read_text(encoding="utf-8")
     pairs = chunk_markdown(md_text)
 
@@ -111,6 +114,7 @@ def build_chunks_for_file(md_path: Path) -> list[Chunk]:
 
 
 def _write_chunks_jsonl(chunks: list[Chunk], out_path: Path) -> None:
+    """Write chunks to a JSONL file."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as f:
         for c in chunks:
@@ -129,6 +133,7 @@ def _write_chunks_jsonl(chunks: list[Chunk], out_path: Path) -> None:
 
 
 def _parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for chunking."""
     parser = argparse.ArgumentParser(
         description="Chunk Markdown files under ./data into JSONL."
     )
@@ -140,6 +145,7 @@ def _parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """CLI entrypoint for chunking markdown files."""
     args = _parse_args()
 
     repo_root = Path(__file__).resolve().parent

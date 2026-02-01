@@ -7,6 +7,7 @@ from typing import Any
 
 
 def _bootstrap_env() -> None:
+    """Load .env and Streamlit secrets (best-effort)."""
     try:
         from rag_tool import bootstrap_env  # local import to avoid hard dependency at import time
 
@@ -23,6 +24,7 @@ class ChatStoreConfig:
 
 
 def _load_config() -> ChatStoreConfig:
+    """Load chat store configuration from environment variables."""
     prefix = os.getenv("CHAT_STORE_PREFIX", "portfolio-chat:")
     ttl_raw = os.getenv("CHAT_STORE_TTL_SECONDS", "")
     ttl: int | None
@@ -42,6 +44,7 @@ def _load_config() -> ChatStoreConfig:
 
 
 def _make_redis_client():
+    """Create a Redis client from environment variables."""
     # Imported lazily so the app can still run without the bonus dependency.
     from upstash_redis import Redis
 
@@ -49,6 +52,7 @@ def _make_redis_client():
 
 
 def _key(conversation_id: str) -> str:
+    """Build a Redis key for a given conversation id."""
     cfg = _load_config()
     return f"{cfg.prefix}{conversation_id}".strip()
 

@@ -11,6 +11,7 @@ from upstash_vector import Index, Vector
 
 
 def require_env(name: str) -> str:
+    """Return the required env var or exit with a clear message."""
     value = os.getenv(name)
     if value is None or value.strip() == "":
         raise SystemExit(
@@ -20,12 +21,14 @@ def require_env(name: str) -> str:
 
 
 def _normalize_optional(value: str | None) -> str | None:
+    """Normalize empty strings to None for optional args/env vars."""
     if value is None or value.strip() == "":
         return None
     return value
 
 
 def iter_jsonl(path: Path) -> list[dict[str, Any]]:
+    """Read a JSONL file into a list of dicts with validation."""
     items: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as f:
         for line_no, line in enumerate(f, start=1):
@@ -40,10 +43,12 @@ def iter_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def batched(seq: list[Any], batch_size: int) -> list[list[Any]]:
+    """Split a list into fixed-size batches."""
     return [seq[i : i + batch_size] for i in range(0, len(seq), batch_size)]
 
 
 def _parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for indexing."""
     parser = argparse.ArgumentParser(
         description="Index chunks.jsonl into an Upstash Vector index (uses REST URL/token from .env)."
     )
@@ -77,12 +82,14 @@ def _parse_args() -> argparse.Namespace:
 
 
 def _resolve_namespace(arg_value: str | None) -> str | None:
+    """Resolve namespace from CLI arg or environment."""
     if arg_value is None:
         return _normalize_optional(os.getenv("UPSTASH_VECTOR_NAMESPACE"))
     return _normalize_optional(arg_value)
 
 
 def _validate_index_url(url: str) -> None:
+    """Validate Upstash REST URL format."""
     if not (url.startswith("https://") or url.startswith("http://")):
         raise SystemExit(
             "UPSTASH_VECTOR_REST_URL must start with https:// (or http://). "
@@ -91,6 +98,7 @@ def _validate_index_url(url: str) -> None:
 
 
 def _load_chunks(repo_root: Path, chunks_arg: str) -> list[dict[str, Any]]:
+    """Load and validate chunks from a JSONL file."""
     chunks_path = (repo_root / chunks_arg).resolve()
     if not chunks_path.exists():
         raise SystemExit(
@@ -104,6 +112,7 @@ def _load_chunks(repo_root: Path, chunks_arg: str) -> list[dict[str, Any]]:
 
 
 def _build_vectors(items: list[dict[str, Any]], id_prefix: str) -> list[Vector]:
+    """Convert chunk dicts into Upstash Vector objects."""
     vectors: list[Vector] = []
     for obj in items:
         chunk_id = str(obj.get("id", "")).strip()

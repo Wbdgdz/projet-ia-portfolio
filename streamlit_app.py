@@ -17,11 +17,13 @@ bootstrap_env(PROJECT_ROOT)
 
 
 def _setup_page() -> None:
+    """Configure Streamlit page metadata and title."""
     st.set_page_config(page_title="Chat Portfolio (RAG)")
     st.title("Chat Portfolio (RAG)")
 
 
 def _get_query_params() -> dict[str, list[str]]:
+    """Return query params in a consistent dict format."""
     try:
         return {k: list(v) for k, v in st.query_params.items()}  # type: ignore[attr-defined]
     except Exception:
@@ -29,6 +31,7 @@ def _get_query_params() -> dict[str, list[str]]:
 
 
 def _set_query_params(**kwargs: str) -> None:
+    """Set query params (compatible with legacy Streamlit API)."""
     try:
         st.query_params.update(kwargs)  # type: ignore[attr-defined]
     except Exception:
@@ -36,6 +39,7 @@ def _set_query_params(**kwargs: str) -> None:
 
 
 def _reset_conversation() -> None:
+    """Reset conversation state and update URL param."""
     new_cid = uuid4().hex
     st.session_state.conversation_id = new_cid
     st.session_state.messages = []
@@ -49,6 +53,7 @@ def _reset_conversation() -> None:
 
 
 def _render_sidebar() -> None:
+    """Render sidebar controls and section list."""
     with st.sidebar:
         st.header("Options")
         if st.button("Réinitialiser la conversation"):
@@ -60,6 +65,7 @@ def _render_sidebar() -> None:
 
 
 def _init_session_state() -> None:
+    """Initialize Streamlit session state with defaults."""
     if "conversation_id" not in st.session_state:
         qp = _get_query_params()
         cid = (qp.get("cid") or [""])[0].strip()
@@ -76,6 +82,7 @@ def _init_session_state() -> None:
 
 
 def _load_persisted_history() -> None:
+    """Load persisted chat history from Redis (if configured)."""
     if "loaded_persisted_history" in st.session_state:
         return
 
@@ -91,12 +98,14 @@ def _load_persisted_history() -> None:
 
 
 def _render_messages() -> None:
+    """Render all messages in the current session."""
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
 
 def _run_agent(agent, user_text: str) -> str:
+    """Execute the agent and return its response (or error message)."""
     try:
         result = Runner.run_sync(
             agent,
@@ -115,6 +124,7 @@ def _run_agent(agent, user_text: str) -> str:
 
 
 def _handle_user_input(agent) -> None:
+    """Handle user input: render, run agent, and persist chat state."""
     user_text = st.chat_input("Pose une question sur mon profil…")
     if not user_text:
         return
@@ -141,6 +151,7 @@ def _handle_user_input(agent) -> None:
 
 
 def main() -> None:
+    """App entrypoint."""
     _setup_page()
     _render_sidebar()
     _init_session_state()

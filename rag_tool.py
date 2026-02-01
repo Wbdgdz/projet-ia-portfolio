@@ -16,6 +16,7 @@ class RagConfig:
 
 
 def _apply_streamlit_secrets_to_env() -> None:
+    """Load Streamlit secrets into env vars if present."""
     try:
         import streamlit as st  # type: ignore
     except Exception:
@@ -44,12 +45,14 @@ def _apply_streamlit_secrets_to_env() -> None:
 
 
 def bootstrap_env(project_root: Path | None = None) -> None:
+    """Load .env and Streamlit secrets into environment variables."""
     root = project_root or Path(__file__).resolve().parent
     load_dotenv(dotenv_path=root / ".env", override=False)
     _apply_streamlit_secrets_to_env()
 
 
 def _require_env(name: str) -> str:
+    """Return the required env var or raise a RuntimeError."""
     value = os.getenv(name)
     if value is None or value.strip() == "":
         raise RuntimeError(
@@ -59,12 +62,14 @@ def _require_env(name: str) -> str:
 
 
 def _normalize_optional(value: str | None) -> str | None:
+    """Normalize empty strings to None for optional env vars."""
     if value is None or value.strip() == "":
         return None
     return value
 
 
 def load_rag_config(project_root: Path | None = None) -> RagConfig:
+    """Load and validate RAG configuration from environment variables."""
     root = project_root or Path(__file__).resolve().parent
     bootstrap_env(root)
 
@@ -77,6 +82,7 @@ def load_rag_config(project_root: Path | None = None) -> RagConfig:
 
 
 def make_index(cfg: RagConfig) -> Index:
+    """Create an Upstash Vector index client from config."""
     if not (cfg.url.startswith("https://") or cfg.url.startswith("http://")):
         raise RuntimeError(
             "UPSTASH_VECTOR_REST_URL must start with https:// (or http://)."
@@ -85,6 +91,7 @@ def make_index(cfg: RagConfig) -> Index:
 
 
 def _extract_source_and_heading(metadata) -> tuple[str | None, str | None]:
+    """Extract source file and heading path from metadata."""
     if not metadata:
         return None, None
 
@@ -98,6 +105,7 @@ def _extract_source_and_heading(metadata) -> tuple[str | None, str | None]:
 
 
 def _format_header(i: int, score: float | None, source: str | None, heading: str | None) -> str:
+    """Format a single result header line."""
     header_bits = [f"{i}) score={score:.3f}"]
     if source:
         header_bits.append(f"source={source}")
@@ -107,6 +115,7 @@ def _format_header(i: int, score: float | None, source: str | None, heading: str
 
 
 def _format_citation(i: int, source: str | None, heading: str | None) -> str | None:
+    """Format a human-readable citation entry."""
     if not (source or heading):
         return None
     label = source or "source_inconnu"
@@ -116,6 +125,7 @@ def _format_citation(i: int, source: str | None, heading: str | None) -> str | N
 
 
 def format_results(results, max_chars: int = 3500) -> str:
+    """Format vector search results into a readable text block."""
     if not results:
         return "Aucun résultat dans la base de connaissances."
 
